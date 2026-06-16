@@ -7,6 +7,8 @@ Clone repository:
 
 git clone --bare https://github.com/johnny22/dotfiles.git $HOME/.dotfiles
 
+Clone submoules:
+config submodule update --init --recursive
 
 Checkout:
 
