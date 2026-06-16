@@ -1,8 +1,22 @@
 " set wrap
+" Set up vertical vs block cursor for insert/normal mode
+if &term =~ "screen."
+    let &t_ti.="\eP\e[1 q\e\\"
+    let &t_SI.="\eP\e[5 q\e\\"
+    let &t_EI.="\eP\e[1 q\e\\"
+    let &t_te.="\eP\e[0 q\e\\"
+else
+    let &t_ti.="\<Esc>[1 q"
+    let &t_SI.="\<Esc>[5 q"
+    let &t_EI.="\<Esc>[1 q"
+    let &t_te.="\<Esc>[0 q"
+endif
+" set guicursor=n-v-c:block
 set wrap linebreak nolist
+set termguicolors
 syntax enable
 set guifont=Monospace\ 12
-colorscheme anotherdark
+colorscheme desert
 set autochdir
 set nocompatible
 " disable mouse
@@ -54,10 +68,24 @@ let g:ackprg = 'ag --nogroup --nocolor --column'
 nnoremap <leader>a :Ag
 
 " ctrlp (fuzzy search)
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
-nnoremap <leader>s :CtrlP
-
+"let g:ctrlp_working_path_mode = 'ra'
+"let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+"nnoremap <leader>s :CtrlP
+function! FZF() abort
+    let l:tempname = tempname()
+    " fzf | awk '{ print $1":1:0" }' > file
+    execute 'silent !fzf --multi ' . '| awk ''{ print $1":1:0" }'' > ' . fnameescape(l:tempname)
+    try
+        execute 'cfile ' . l:tempname
+        redraw!
+    finally
+        call delete(l:tempname)
+    endtry
+endfunction
+" :Files
+command! -nargs=* Files call FZF()
+" \ff
+nnoremap <leader>ff :Files<cr>
 " Persistnet undo
 if has ("persistent_undo")
     set undofile
@@ -71,7 +99,7 @@ endif
 nnoremap <leader>u :UndotreeToggle<CR>
 
 " plugin manager
-execute pathogen#infect()
+" execute pathogen#infect()
 
 " Folding 
 set foldenable
